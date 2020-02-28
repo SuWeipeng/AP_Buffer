@@ -1,8 +1,12 @@
+#if defined(USE_RTTHREAD)
 #include <entry.h>
+#endif
 #include "AP_Buffer.h"
 #include "AP_Buffer_Ring.h"
 
+#if defined(USE_RTTHREAD)
 using namespace rtthread;
+#endif
 
 static uint8_t ap_buffer[AP_BUFFER_MAX_SIZE];
 
