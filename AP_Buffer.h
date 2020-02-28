@@ -2,8 +2,11 @@
 #define __AP_BUFFER_H__
 
 #include <stdint.h>
+#include <rtt_interface.h>
 
-#define AP_BUFFER_MAX_SIZE  (6)
+#ifndef AP_BUFFER_MAX_SIZE
+#define AP_BUFFER_MAX_SIZE  (1024)
+#endif
 
 class AP_Buffer_Backend;
 
