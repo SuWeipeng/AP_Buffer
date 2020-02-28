@@ -1,6 +1,7 @@
 #if defined(USE_RTTHREAD)
 #include <entry.h>
 #endif
+#include <stdio.h>
 #include "AP_Buffer.h"
 #include "AP_Buffer_Ring.h"
 

@@ -1,5 +1,13 @@
+#if defined(USE_RTTHREAD)
 #include <entry.h>
+#else
+#include <string.h>
+#endif
 #include "AP_Buffer_Ring.h"
+
+#ifndef USE_RTTHREAD
+#define rt_memcpy memcpy
+#endif
 
 #define RING_BUFFER_MAX_INDEX (AP_BUFFER_MAX_SIZE - 1)
 
