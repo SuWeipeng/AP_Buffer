@@ -9,14 +9,11 @@
 #define rt_memcpy memcpy
 #endif
 
-#define RING_BUFFER_MAX_INDEX (AP_BUFFER_MAX_SIZE - 1)
-
-static uint8_t read_buf[AP_BUFFER_MAX_SIZE];
-
-AP_Buffer_Ring::AP_Buffer_Ring(AP_Buffer &instance, void* buffer)
+AP_Buffer_Ring::AP_Buffer_Ring(AP_Buffer &instance, void* w_buf, void* r_buf)
 : AP_Buffer_Backend(instance)
-, _head(buffer)
-, _tail(buffer)
+, _head(w_buf)
+, _tail(w_buf)
+, _r_buf(r_buf)
 {
 }
 
@@ -25,7 +22,7 @@ AP_Buffer_Ring::write(const void *pBuffer, uint16_t size)
 {
   uint16_t write_size = size;
   uint8_t* tmp_pt     = (uint8_t*)_tail;
-  uint16_t check      = &_frontend._buf._buffer[RING_BUFFER_MAX_INDEX] - tmp_pt;
+  uint16_t check      = &_frontend._buf.w_buf[AP_BUFFER_MAX_INDEX] - tmp_pt;
   
   // Cut pBuffer
   if(size >= AP_BUFFER_MAX_SIZE){
@@ -44,7 +41,7 @@ AP_Buffer_Ring::write(const void *pBuffer, uint16_t size)
     uint8_t* tmp_pBuffer = (uint8_t*)pBuffer+(check+1);
     
     rt_memcpy(_tail, pBuffer, check+1);
-    _tail = _frontend._buf._buffer;
+    _tail = _frontend._buf.w_buf;
     tmp_pt = (uint8_t*)_tail;
     _frontend._buf.count += (check+1);
     if(remain > 0){
@@ -60,8 +57,8 @@ uint16_t
 AP_Buffer_Ring::read(void)
 {
   uint8_t* tmp_ph     = (uint8_t*)_head;
-  uint8_t* to_buf     = read_buf;
-  uint16_t check      = &_frontend._buf._buffer[RING_BUFFER_MAX_INDEX] - tmp_ph;
+  uint8_t* to_buf     = (uint8_t*)_r_buf;
+  uint16_t check      = &_frontend._buf.w_buf[AP_BUFFER_MAX_INDEX] - tmp_ph;
   uint16_t read_1st   = 0;
   uint16_t read_2nd   = 0;
   
@@ -69,10 +66,10 @@ AP_Buffer_Ring::read(void)
   
   if(_frontend._buf.count >= AP_BUFFER_MAX_SIZE){
     tmp_ph = (uint8_t*)_tail;
-    check  = &_frontend._buf._buffer[RING_BUFFER_MAX_INDEX] - tmp_ph;
+    check  = &_frontend._buf.w_buf[AP_BUFFER_MAX_INDEX] - tmp_ph;
     read_1st = check + 1;
     rt_memcpy(to_buf, tmp_ph, read_1st);
-    tmp_ph = _frontend._buf._buffer;
+    tmp_ph = _frontend._buf.w_buf;
     _frontend._buf.count -= read_1st;
     read_2nd = AP_BUFFER_MAX_SIZE-read_1st;
     if(read_2nd > 0){
@@ -92,7 +89,7 @@ AP_Buffer_Ring::read(void)
     } else {
       read_1st = check + 1;
       rt_memcpy(to_buf, tmp_ph, read_1st);
-      tmp_ph = _frontend._buf._buffer;
+      tmp_ph = _frontend._buf.w_buf;
       _frontend._buf.count -= read_1st;
       read_2nd = (uint8_t*)_tail - tmp_ph;
       if(read_2nd > 0){
@@ -105,10 +102,4 @@ AP_Buffer_Ring::read(void)
   _head = tmp_ph;
   
   return read_1st + read_2nd;
-}
-
-void*      
-AP_Buffer_Ring::read_buf_addr(void)
-{
-  return read_buf;
 }

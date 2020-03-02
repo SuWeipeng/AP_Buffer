@@ -10,7 +10,6 @@ public:
   
   virtual void       write(const void *pBuffer, uint16_t size) = 0;
   virtual uint16_t   read(void) = 0;
-  virtual void*      read_buf_addr(void) = 0;
   
 protected:
   AP_Buffer &_frontend;

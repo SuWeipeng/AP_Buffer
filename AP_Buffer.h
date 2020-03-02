@@ -7,12 +7,14 @@
 #ifndef AP_BUFFER_MAX_SIZE
 #define AP_BUFFER_MAX_SIZE  (1024)
 #endif
+#define AP_BUFFER_MAX_INDEX (AP_BUFFER_MAX_SIZE - 1)
 
 class AP_Buffer_Backend;
 
 class AP_Buffer{
   friend class AP_Buffer_Backend;
   friend class AP_Buffer_Ring;
+  friend class AP_Buffer_FIFO;
 public:
   AP_Buffer();
   ~AP_Buffer(){};
@@ -37,8 +39,9 @@ public:
   
 private:  
   typedef struct Buffer {
-    uint8_t*  _buffer;
-    uint16_t count;
+    uint8_t*  w_buf;
+    uint8_t*  r_buf;
+    uint16_t  count;
   } _ap_buffer;  
   
   static AP_Buffer*       _instance;
