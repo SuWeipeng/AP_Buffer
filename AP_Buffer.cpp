@@ -17,6 +17,7 @@ AP_Buffer *AP_Buffer::_instance;
 
 AP_Buffer::AP_Buffer()
 : _backend(NULL)
+, _type(NONE)
 {
   _buf.w_buf = write_buffer;
   _buf.r_buf = read_buffer;
@@ -27,7 +28,8 @@ AP_Buffer::AP_Buffer()
 void
 AP_Buffer::init(buffer_type_t type)
 {
-  switch(type){
+  _type = type;
+  switch(_type){
   case RING:{
     _backend = new AP_Buffer_Ring(*this, _buf.w_buf, _buf.r_buf);
     break;
@@ -36,6 +38,8 @@ AP_Buffer::init(buffer_type_t type)
     _backend = new AP_Buffer_FIFO(*this, _buf.w_buf, _buf.r_buf);
     break;
   }
+  default:
+    break;
   }
 }
 
