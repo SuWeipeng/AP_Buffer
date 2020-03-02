@@ -12,6 +12,7 @@ public:
   virtual uint16_t   read(void);
   
 private:
+  void* _mem_rev(void* buf, uint16_t size);
   void* _w_buf;
   void* _r_buf;
 };
