@@ -48,6 +48,11 @@ AP_Buffer::write(const void *pBuffer, uint16_t size)
 {
   if(_backend != NULL){
     _backend -> write(pBuffer, size);
+#if defined(USE_RTTHREAD)
+    if(_buf.count >= AP_BUFFER_MAX_SIZE){
+        rt_kprintf("_buf.cont override: %d\n", _buf.count);
+    }
+#endif
   }
 }
 
